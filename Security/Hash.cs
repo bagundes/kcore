@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace K.Core.Security
+namespace KCore.Security
 {
     public static class Hash
     {
@@ -53,7 +53,7 @@ namespace K.Core.Security
             }
             catch (Exception ex)
             {
-                K.Core.Diagnostic.Error(R.ID, LOG, ex.Message, ex.StackTrace, ex.Source);
+                KCore.Diagnostic.Error(R.ID, LOG, ex.Message, ex.StackTrace, ex.Source);
                 throw new KCoreException(LOG, C.MessageEx.ItNotPossibleDecrypt_8_1, key);
             }
         }

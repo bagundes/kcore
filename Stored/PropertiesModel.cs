@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace K.Core.Stored
+namespace KCore.Stored
 {
     public class PropertiesModel
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 
-namespace K.Core.Model
+namespace KCore.Model
 {
     [JsonObject(MemberSerialization.OptIn)]
     public sealed class Credential : Base.BaseModel
@@ -35,7 +35,7 @@ namespace K.Core.Model
                 if (Expire < DateTime.Now)
                     throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
                 else
-                    return K.Core.Security.Hash.PasswdToKey(Instance, ToJson());
+                    return KCore.Security.Hash.PasswdToKey(Instance, ToJson());
             }
         }
         [JsonProperty]
@@ -69,7 +69,7 @@ namespace K.Core.Model
         {
             try
             {
-                var obj = K.Core.Security.Hash.KeyToPasswd(instance, token);
+                var obj = KCore.Security.Hash.KeyToPasswd(instance, token);
                 var val = Newtonsoft.Json.JsonConvert.DeserializeObject<Serialize>(obj);
 
                 if (this.Expire < DateTime.Now)
@@ -85,8 +85,8 @@ namespace K.Core.Model
                 
             }catch(Exception ex)
             {
-                var id = K.Core.Diagnostic.Track(LOG, $"Machine:{instance}", $"Token:{token}", ex.Message);
-                K.Core.Diagnostic.Error(R.ID, LOG, id, "Error when application tried to read token.");
+                var id = KCore.Diagnostic.Track(LOG, $"Machine:{instance}", $"Token:{token}", ex.Message);
+                KCore.Diagnostic.Error(R.ID, LOG, id, "Error when application tried to read token.");
                 throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
             }
 

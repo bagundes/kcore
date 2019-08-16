@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace K.Core.Console
+namespace KCore.Console
 {
     /// <summary>
     /// Create animation ASCII progressbar.

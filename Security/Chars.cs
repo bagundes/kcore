@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace K.Core.Security
+namespace KCore.Security
 {
     public static class Chars
     {

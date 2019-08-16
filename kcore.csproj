@@ -2,10 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>K.Core</RootNamespace>
-    <AssemblyVersion>1001.0.0.0</AssemblyVersion>
+    <RootNamespace>KCore</RootNamespace>
+    <AssemblyVersion>1001.1.0.1</AssemblyVersion>
     <FileVersion>1001.0.0.0</FileVersion>
     <Platforms>AnyCPU;x86</Platforms>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>KCore_bfagundes</PackageId>
+    <Version>1001.1.0.1</Version>
+    <Authors>Bruno de Lima Fagundes</Authors>
+    <Company>runo de Lima Fagundes</Company>
+    <Description>Main library to my internal projects</Description>
   </PropertyGroup>
 
   <ItemGroup>

@@ -4,15 +4,15 @@ using System.IO;
 using System.Net;
 using System.Text;
 
-namespace K.Core.Web
+namespace KCore.Web
 {
     public class Ftp
     {
 
         public double Percent { get; internal set; }
-        public K.Core.Model.Credential2 cred { get; internal set; }
+        public KCore.Model.Credential2 cred { get; internal set; }
 
-        public Ftp(K.Core.Model.Credential2 cred)
+        public Ftp(KCore.Model.Credential2 cred)
         {
             this.cred = cred;
         }

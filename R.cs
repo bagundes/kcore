@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Resources;
 using System.Text;
 
-namespace K.Core
+namespace KCore
 {
     public static class R
     {
@@ -25,7 +25,7 @@ namespace K.Core
                 return resx;
             }
         }
-        public static string Prefix => $"{K.Core.R.Company.Namespace}_{Project.Namespace}";
+        public static string Prefix => $"{KCore.R.Company.Namespace}_{Project.Namespace}";
         public static class Project
         {
             public static string Language => R.Language;
@@ -36,7 +36,7 @@ namespace K.Core
             
             public static class Folders
             {
-                public static string Credential => K.Core.Shell.Directory.Temp(Project.Name, "credentials");
+                public static string Credential => KCore.Shell.Directory.Temp(Project.Name, "credentials");
             }
         }
         public static class Security

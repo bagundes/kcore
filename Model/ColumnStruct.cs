@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Model
+namespace KCore.Model
 {
     public class ColumnStruct : Base.BaseModel
     {

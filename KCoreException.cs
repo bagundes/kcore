@@ -4,7 +4,7 @@ using System.Resources;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace K.Core
+namespace KCore
 {
     public class KCoreException : Base.BaseException
     {

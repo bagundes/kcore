@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace K.Core
+namespace KCore
 {
     public class Reflection
     {
@@ -34,7 +34,7 @@ namespace K.Core
             }
             catch (Exception ex)
             {
-                K.Core.Diagnostic.Error(R.ID, model.LOG, ex.Message, ex.StackTrace, ex.Source);
+                KCore.Diagnostic.Error(R.ID, model.LOG, ex.Message, ex.StackTrace, ex.Source);
                 return false;
             }
         }

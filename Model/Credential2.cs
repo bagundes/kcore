@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace K.Core.Model
+namespace KCore.Model
 {
     [JsonObject(MemberSerialization.OptIn)]
     public sealed class Credential2 : Base.BaseModel
@@ -66,7 +66,7 @@ namespace K.Core.Model
                 if (LastUpdate.AddMinutes(Expire) < DateTime.Now)
                     throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
                 else
-                    return K.Core.Security.Hash.PasswdToKey(key, Serialize());
+                    return KCore.Security.Hash.PasswdToKey(key, Serialize());
             }
         }
 
@@ -108,11 +108,11 @@ namespace K.Core.Model
 
         public string Save()
         {
-            var foo = K.Core.Security.Hash.MD5(key, R.Security.MasterKey);
+            var foo = KCore.Security.Hash.MD5(key, R.Security.MasterKey);
             var file = $"{Folder}\\{foo}.credential";
             
             
-            K.Core.Shell.File.Save(Token, file, true, true);
+            KCore.Shell.File.Save(Token, file, true, true);
             return Token;
         }
 
@@ -136,7 +136,7 @@ namespace K.Core.Model
 
         public void Load(string key, string host)
         {
-            var foo = K.Core.Security.Hash.MD5(key, R.Security.MasterKey);
+            var foo = KCore.Security.Hash.MD5(key, R.Security.MasterKey);
             var file = new FileInfo($"{Folder}/{foo}.credential");
             this.key = key;
             LastUpdate = file.LastAccessTime;
@@ -145,7 +145,7 @@ namespace K.Core.Model
                 throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
 
             string text = System.IO.File.ReadAllText(file.ToString());
-            var json = K.Core.Security.Hash.KeyToPasswd(UserKey, text);
+            var json = KCore.Security.Hash.KeyToPasswd(UserKey, text);
             var cred = Newtonsoft.Json.JsonConvert.DeserializeObject<PersonalSerialize>(json);
 
 #if !DEBUG
@@ -183,7 +183,7 @@ namespace K.Core.Model
 
         public void DestroySession()
         {
-            var foo = K.Core.Security.Hash.MD5(UserKey, R.Security.MasterKey);
+            var foo = KCore.Security.Hash.MD5(UserKey, R.Security.MasterKey);
             var file = new FileInfo($"{Folder}/{foo}.credential");
             System.IO.File.Delete(file.ToString());
         }

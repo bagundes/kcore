@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core
+namespace KCore
 {
     public static class Diagnostic
     {

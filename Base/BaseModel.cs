@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace K.Core.Base
+namespace KCore.Base
 {
     public interface IBaseModel
     {
@@ -91,8 +91,8 @@ namespace K.Core.Base
         //    if (!this.Equals(model))
         //        throw new System.Exception();
 
-        //    foreach (var p in K.Core.Reflection.FilterOnlySetProperties(model))
-        //        K.Core.Reflection.SetValue(this, p.Name, p.GetValue(model));
+        //    foreach (var p in KCore.Reflection.FilterOnlySetProperties(model))
+        //        KCore.Reflection.SetValue(this, p.Name, p.GetValue(model));
         //}
 
         //public virtual T Clone<T>() where T : BaseModel, new()
@@ -101,8 +101,8 @@ namespace K.Core.Base
 
             //var t = (T) Activator.CreateInstance(this.GetType(), new object[] { });
 
-            //foreach (var p in K.Core.Reflection.FilterOnlySetProperties(this))
-            //    K.Core.Reflection.SetValue(t, p.Name, p.GetValue(p.Name));
+            //foreach (var p in KCore.Reflection.FilterOnlySetProperties(this))
+            //    KCore.Reflection.SetValue(t, p.Name, p.GetValue(p.Name));
 
             //return new T();
         //}

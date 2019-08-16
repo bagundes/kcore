@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Model
+namespace KCore.Model
 {
     public sealed class DataInfo : Base.BaseModel
     {

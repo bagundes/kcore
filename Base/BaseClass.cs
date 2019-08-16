@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Base
+namespace KCore.Base
 {
     public abstract class BaseClass
     {

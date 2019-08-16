@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Shell
+namespace KCore.Shell
 {
     public static class MachineInfo
     {

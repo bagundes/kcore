@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Model
+namespace KCore.Model
 {
     [JsonObject(MemberSerialization.OptIn)]
     public sealed class Select2 : Base.BaseModel
@@ -23,7 +23,7 @@ namespace K.Core.Model
 
         public Select2(dynamic value, string text, bool encrypt = false, bool @default = false)
         {
-            this.value = encrypt ? K.Core.Security.Hash.Encrypt(value) : value;
+            this.value = encrypt ? KCore.Security.Hash.Encrypt(value) : value;
             this.text = text;
             this.def = @default;
         }

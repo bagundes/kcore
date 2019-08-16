@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Model
+namespace KCore.Model
 {
     [Obsolete]
     [JsonObject(MemberSerialization.OptIn)]
@@ -24,7 +24,7 @@ namespace K.Core.Model
 
         public Select(dynamic value, string text, bool encrypt = false, bool @default = false)
         {
-            Value = encrypt ? K.Core.Security.Hash.Encrypt(value) : value;
+            Value = encrypt ? KCore.Security.Hash.Encrypt(value) : value;
             Text = text;
             Default = @default;
         }

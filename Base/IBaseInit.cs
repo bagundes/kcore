@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Base
+namespace KCore.Base
 {
     /// <summary>
     /// Interface to init script the project. The Kcore will execute in this order:

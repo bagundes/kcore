@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace K.Core.Shell
+namespace KCore.Shell
 {
     public static class File
     {
@@ -11,7 +11,7 @@ namespace K.Core.Shell
 
         public static string SaveTempDir(string prjName, string line, string filename, bool ovride = false, bool wait = true)
         {
-            filename = $"{K.Core.Shell.Directory.Temp(prjName)}/{filename}";
+            filename = $"{KCore.Shell.Directory.Temp(prjName)}/{filename}";
             Save(line, filename, ovride, wait);
             return filename;
         }

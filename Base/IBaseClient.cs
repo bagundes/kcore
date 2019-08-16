@@ -1,9 +1,9 @@
-﻿using K.Core.Model;
+﻿using KCore.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Base
+namespace KCore.Base
 {
     public interface IBaseClient : System.IDisposable
     {

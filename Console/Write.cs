@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Console
+namespace KCore.Console
 {
     public static class Write
     {

@@ -7,7 +7,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace K.Core
+namespace KCore
 {
     [JsonObject(MemberSerialization.OptIn)]
     public partial class Dynamic : Base.BaseModel
@@ -239,7 +239,7 @@ namespace K.Core
         /// <param name="symbol">Symbol</param>
         /// <param name="symbolend">Put the symbol in the end?</param>
         /// <returns></returns>
-        public string ToPriceString(K.Core.C.Language lng, string symbol = "€", bool symbolend = false)
+        public string ToPriceString(KCore.C.Language lng, string symbol = "€", bool symbolend = false)
         {
             var ci = CultureInfo.GetCultureInfo(lng.ToString().Replace('_', '-'));
 

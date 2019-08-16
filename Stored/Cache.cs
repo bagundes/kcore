@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Stored
+namespace KCore.Stored
 {
     public static class Cache
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace K.Core.Config
+namespace KCore.Config
 {
     public static class Init
     {
