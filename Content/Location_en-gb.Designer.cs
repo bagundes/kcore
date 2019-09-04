@@ -63,81 +63,90 @@ namespace KCore.Content {
         /// <summary>
         ///   Looks up a localized string similar to Fatal error: {0}.
         /// </summary>
-        internal static string E00001_1 {
+        internal static string M00001_1 {
             get {
-                return ResourceManager.GetString("E00001_1", resourceCulture);
+                return ResourceManager.GetString("M00001_1", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Error to connect the {0} database..
         /// </summary>
-        internal static string E00002_1 {
+        internal static string M00002_1 {
             get {
-                return ResourceManager.GetString("E00002_1", resourceCulture);
+                return ResourceManager.GetString("M00002_1", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The key is not correct format..
         /// </summary>
-        internal static string E00003_0 {
+        internal static string M00003_0 {
             get {
-                return ResourceManager.GetString("E00003_0", resourceCulture);
+                return ResourceManager.GetString("M00003_0", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The value  is not correct format (request:{0}, value{1})..
         /// </summary>
-        internal static string E00004_2 {
+        internal static string M00004_2 {
             get {
-                return ResourceManager.GetString("E00004_2", resourceCulture);
+                return ResourceManager.GetString("M00004_2", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The directory is invalid. {0}.
         /// </summary>
-        internal static string E00005_1 {
+        internal static string M00005_1 {
             get {
-                return ResourceManager.GetString("E00005_1", resourceCulture);
+                return ResourceManager.GetString("M00005_1", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The login expired, please login again..
         /// </summary>
-        internal static string E00006_0 {
+        internal static string M00006_0 {
             get {
-                return ResourceManager.GetString("E00006_0", resourceCulture);
+                return ResourceManager.GetString("M00006_0", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Invalid the password key..
         /// </summary>
-        internal static string E00007_0 {
+        internal static string M00007_0 {
             get {
-                return ResourceManager.GetString("E00007_0", resourceCulture);
+                return ResourceManager.GetString("M00007_0", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to It&apos;s not possible to decrypt the key {0}.
         /// </summary>
-        internal static string E00008_1 {
+        internal static string M00008_1 {
             get {
-                return ResourceManager.GetString("E00008_1", resourceCulture);
+                return ResourceManager.GetString("M00008_1", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to User is using the invalid security key..
         /// </summary>
-        internal static string E00009_0 {
+        internal static string M00009_0 {
             get {
-                return ResourceManager.GetString("E00009_0", resourceCulture);
+                return ResourceManager.GetString("M00009_0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: {0}.
+        /// </summary>
+        internal static string M00010_1 {
+            get {
+                return ResourceManager.GetString("M00010_1", resourceCulture);
             }
         }
     }

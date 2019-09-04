@@ -15,11 +15,11 @@ namespace KCore
         {
         }
 
-        public KCoreException(string log, C.MessageEx code, params dynamic[] values) : base(log, code, values)
+        public KCoreException(string log, C.MessageEx code, params dynamic[] values) : base(log, Convert.ToInt32(code), values)
         {
         }
 
-        public KCoreException(string log, C.MessageEx code, Exception innerException) : base(log, code, innerException)
+        public KCoreException(string log, C.MessageEx code, Exception innerException) : base(log, Convert.ToInt32(code), innerException)
         {
         }
     }

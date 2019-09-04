@@ -8,6 +8,7 @@ namespace KCore.Stored
 {
     public class PropertiesModel
     {
+        public const string LOG = "PropertiesModel";
         private Dictionary<string, dynamic> Properties;
 
 
@@ -19,12 +20,23 @@ namespace KCore.Stored
             Properties = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(json);
         }
 
-        public Dynamic Get(string key)
+        /// <summary>
+        /// Get the parameter value
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="msgerror">Create exception when the Key is not exists</param>
+        /// <returns></returns>
+        public Dynamic Get(string key, string msgerror = null)
         {
             if (Properties.Where(t => t.Key.ToUpper() == key.ToUpper()).Any())
-                return Properties.Where(t => t.Key.ToUpper() == key.ToUpper()).Select(t => t.Value).FirstOrDefault();
+                return new Dynamic(Properties.Where(t => t.Key.ToUpper() == key.ToUpper()).Select(t => t.Value).FirstOrDefault());
             else
-                return Dynamic.Empty;
+            {
+                if (String.IsNullOrEmpty(msgerror))
+                    throw new KCoreException(LOG, C.MessageEx.StoredCacheError10_1, msgerror);
+                else
+                    return Dynamic.Empty;
+            }
         }
 
         public void Set(string key, dynamic value)

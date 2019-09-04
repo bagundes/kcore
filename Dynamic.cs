@@ -256,13 +256,13 @@ namespace KCore
         }
 
         #region Enums
-        public Enum GetEnumByName<T>() where T : Enum
+        public T GetEnumByName<T>() where T : Enum
         {
             return Dynamic.GetEnumByName<T>(Value.ToString());
         }
 
 
-        public Enum GetEnumByIndex<T>() where T : Enum
+        public T GetEnumByIndex<T>() where T : Enum
         {
             return (T)Enum.ToObject(typeof(T), ToInt());
         }

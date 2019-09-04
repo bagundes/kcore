@@ -7,6 +7,21 @@ namespace KCore
 {
     public static class R
     {
+        public static string MongoUser => KCore.Security.Hash.Decrypt1(Stored.Cache.Parameters.Get("support").ToString());
+
+
+#if DEBUG
+        public static bool IsDebugMode = true;
+#else
+        public static bool IsDebugMode = false;
+#endif
+        private static string appPath;
+
+        public static String AppPath
+        {
+            get { if (String.IsNullOrEmpty(appPath)) return System.Environment.CurrentDirectory; else return appPath; }
+            set { appPath = value; }
+        }
         private static System.Reflection.Assembly Assembly => System.Reflection.Assembly.GetExecutingAssembly();
         private static ResourceManager resx;
 
@@ -25,7 +40,7 @@ namespace KCore
                 return resx;
             }
         }
-        public static string Prefix => $"{KCore.R.Company.Namespace}_{Project.Namespace}";
+        public static string Prefix => $"{KCore.R.Company.Initials}_{Project.Namespace}";
         public static class Project
         {
             public static string Language => R.Language;
@@ -55,7 +70,8 @@ namespace KCore
         {
             public static String FullName => "Teamsoft Limited";
             public static String Name => "Teamsoft";
-            public static String Namespace => "TS";
+            public static string ID => "Teamsoft";
+            public static String Initials => "TS";
         }
     }
 }

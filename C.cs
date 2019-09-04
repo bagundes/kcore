@@ -26,7 +26,7 @@ namespace KCore
             InvalidPwdKey7_0 = 7,
             ItNotPossibleDecrypt_8_1 = 8,
             E_InvalidKey9 = 9,
-
+            StoredCacheError10_1 = 10,
         }
 
         /// <summary>
@@ -60,6 +60,17 @@ namespace KCore
                 Alpha = 'A',
                 Price = 'P',
                 None = '0',
+            }
+
+            public enum Actions
+            {
+                Add = Added,
+                Added = 1,
+                Update = Updated,
+                Updated = 2,
+                Delete = Deleted,
+                Deleted = 3,
+                Error = -1,
             }
 
         }

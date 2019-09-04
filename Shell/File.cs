@@ -24,7 +24,7 @@ namespace KCore.Shell
         /// <param name="filename">URL (full path file)</param>
         /// <param name="ovride">Override the file</param>
         /// <param name="wait">Wait the file unlock</param>
-        public static async void Save(string[] lines, string filename, bool ovride = false, bool wait = false)
+        public static void Save(string[] lines, string filename, bool ovride = false, bool wait = false)
         {
             var fileInfo = new FileInfo(filename);
             System.IO.Directory.CreateDirectory(fileInfo.DirectoryName);

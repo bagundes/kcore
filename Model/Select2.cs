@@ -12,13 +12,16 @@ namespace KCore.Model
         public dynamic value;
         [JsonProperty]
         public string text;
+        public bool encrypt;
         public bool def;
 
         public Select2() { }
 
-        public Select2(dynamic value)
+        public Select2(dynamic value, bool encrypt = false)
         {
-            this.value = value;
+            this.value = encrypt ? KCore.Security.Hash.Encrypt(value) : value;
+            this.text = value;
+            this.encrypt = encrypt;
         }
 
         public Select2(dynamic value, string text, bool encrypt = false, bool @default = false)
@@ -26,6 +29,7 @@ namespace KCore.Model
             this.value = encrypt ? KCore.Security.Hash.Encrypt(value) : value;
             this.text = text;
             this.def = @default;
+            this.encrypt = encrypt;
         }
 
 

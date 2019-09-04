@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace KCore.Stored
@@ -10,10 +11,19 @@ namespace KCore.Stored
 
         public static void LoadParameters()
         {
+            string file;
+
+
 #if DEBUG
-            var file = System.IO.Path.Combine(System.Environment.CurrentDirectory,"config.dev.json");
+            file = System.IO.Path.Combine(R.AppPath,"config.dev.json");
+            if (!System.IO.File.Exists(file) && R.IsDebugMode)
+            {
+                System.IO.File.Copy(System.IO.Path.Combine(R.AppPath, "config.json"),
+                    System.IO.Path.Combine(R.AppPath, "config.dev.json"));                
+            }
+
 #else
-            var file = System.IO.Path.Combine(System.Environment.CurrentDirectory,"config.json");
+            file = System.IO.Path.Combine(R.AppPath,"config.json");
 #endif
             if (System.IO.File.Exists(file))
                 Parameters = new PropertiesModel(file);

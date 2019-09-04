@@ -18,6 +18,10 @@ namespace KCore.Base
 
     public abstract class BaseModel : BaseClass, IBaseModel
     {
+        public string Id;
+        public int updated;
+        public DateTime? lastModified;
+
         /// <summary>
         /// Transform all model properties to select model
         /// </summary>

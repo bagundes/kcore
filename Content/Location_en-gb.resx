@@ -117,32 +117,35 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="E00001_1" xml:space="preserve">
+  <data name="M00001_1" xml:space="preserve">
     <value>Fatal error: {0}</value>
   </data>
-  <data name="E00002_1" xml:space="preserve">
+  <data name="M00002_1" xml:space="preserve">
     <value>Error to connect the {0} database.</value>
     <comment>Verify the information connection,</comment>
   </data>
-  <data name="E00003_0" xml:space="preserve">
+  <data name="M00003_0" xml:space="preserve">
     <value>The key is not correct format.</value>
   </data>
-  <data name="E00004_2" xml:space="preserve">
+  <data name="M00004_2" xml:space="preserve">
     <value>The value  is not correct format (request:{0}, value{1}).</value>
   </data>
-  <data name="E00005_1" xml:space="preserve">
+  <data name="M00005_1" xml:space="preserve">
     <value>The directory is invalid. {0}</value>
   </data>
-  <data name="E00006_0" xml:space="preserve">
+  <data name="M00006_0" xml:space="preserve">
     <value>The login expired, please login again.</value>
   </data>
-  <data name="E00007_0" xml:space="preserve">
+  <data name="M00007_0" xml:space="preserve">
     <value>Invalid the password key.</value>
   </data>
-  <data name="E00008_1" xml:space="preserve">
+  <data name="M00008_1" xml:space="preserve">
     <value>It's not possible to decrypt the key {0}</value>
   </data>
-  <data name="E00009_0" xml:space="preserve">
+  <data name="M00009_0" xml:space="preserve">
     <value>User is using the invalid security key.</value>
+  </data>
+  <data name="M00010_1" xml:space="preserve">
+    <value>Error: {0}</value>
   </data>
 </root>
