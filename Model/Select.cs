@@ -5,46 +5,54 @@ using System.Text;
 
 namespace KCore.Model
 {
-    [Obsolete]
-    [JsonObject(MemberSerialization.OptIn)]
-    public sealed class Select : Base.BaseModel
+    public class Select : Base.BaseModel
     {
-        [JsonProperty]
-        public dynamic Value { get; set; }
-        [JsonProperty]
-        public string Text { get; set; }
-        public bool Default { get; set; }
+        public dynamic value;     
+        public string text;        
+        public bool flag;
+
+        [JsonIgnoreAttribute]
+        public bool encrypt;
 
         public Select() { }
 
-        public Select(dynamic value)
+        public Select(object value, bool encrypt = false)
         {
-            Value = value;
-        }
+            this.value = value;
+            this.text = value.ToString();
+            this.encrypt = encrypt;
 
-        public Select(dynamic value, string text, bool encrypt = false, bool @default = false)
-        {
-            Value = encrypt ? KCore.Security.Hash.Encrypt(value) : value;
-            Text = text;
-            Default = @default;
+            if (encrypt)
+                EncryptValue();
         }
-
 
         /// <summary>
-        /// Load the values in a string.
+        /// Select model
         /// </summary>
-        /// <param name="values"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static Select[] Split(string values, char separator)
+        /// <param name="value">Value</param>
+        /// <param name="text">Text</param>
+        /// <param name="flag">Flag for any detail</param>
+        /// <param name="encrypt">Encrypt the value?</param>
+        public Select(object value, string text, bool flag = false, bool encrypt = false)
         {
-            var strArray = values.Split(separator);
-            var sel = new List<Select>();
+            this.value = value;
+            this.text = text;
+            this.flag = flag;
+            this.encrypt = encrypt;
 
-            foreach (var str in strArray)
-                sel.Add(new Select(str));
+            if (encrypt)
+                EncryptValue();
+        }
 
-            return sel.ToArray();
+        public void EncryptValue()
+        {
+            KCore.Security.Hash.Encrypt(value.ToString(), null);
+            this.encrypt = true;
+        }
+
+        public Select_v2 ToV2()
+        {
+            return new Select_v2(value, text, encrypt, flag);
         }
     }
 }

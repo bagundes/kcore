@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace KCore
+﻿namespace KCore
 {
     public static class C
     {
@@ -16,6 +12,7 @@ namespace KCore
             Fatal
         }
 
+
         public enum MessageEx
         {
             FatalError1_1 = 1,
@@ -27,6 +24,7 @@ namespace KCore
             ItNotPossibleDecrypt_8_1 = 8,
             E_InvalidKey9 = 9,
             StoredCacheError10_1 = 10,
+            InvalidCredential11_0 = 11,
         }
 
         /// <summary>
@@ -34,7 +32,7 @@ namespace KCore
         /// </summary>
         public class Database
         {
-            public enum ServerType
+            public enum DBaseType
             {
                 MSQL,
                 Hana,
@@ -51,6 +49,7 @@ namespace KCore
                 DateTime,
                 Char,
                 None,
+                Int,
             }
 
             public enum TypeID
@@ -73,13 +72,20 @@ namespace KCore
                 Error = -1,
             }
 
+            public enum ClientType
+            {
+                SQLClient,
+                SAPClient,
+                HanaClient,
+            }
+
         }
 
         public enum Language
         {
             en_IE = 1,
             en_UK = 2,
-            en_US =3,
+            en_US = 3,
         }
 
         public static class RegexMask

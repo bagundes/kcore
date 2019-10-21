@@ -15,14 +15,14 @@ namespace KCore
         /// <param name="name">Property name</param>
         /// <param name="value">Value</param>
         /// <returns>Accepted</returns>
-        public static bool SetValue<T>(T model, string name, object value) where T : Base.BaseModel
+        public static bool SetValue<T>(T model, string name, object value) where T : Base.BaseModel_v1
         {
             try
             {
                 name = (model.GetType().GetProperties()).Where(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Select(t => t.Name).FirstOrDefault();
 
                 if (name is null) return false;
-
+                if (String.IsNullOrEmpty(value.ToString())) return true;
                 var proper = model.GetType().GetProperty(name);
 
                 if (proper is null)
@@ -47,7 +47,7 @@ namespace KCore
             var key = p.GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
             if (key != null)
                 return key.GetValue(obj);
-            
+
             // Fields
             var key1 = p.GetField(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
             if (key1 != null)
@@ -130,13 +130,15 @@ namespace KCore
 
             foreach (var member in p.GetMembers())
             {
-                if(!ignore.Contains(member.Name))
+                if (!ignore.Contains(member.Name))
                     res.Add(member);
             }
 
 
             return res.ToArray();
         }
+
+
 
         public static PropertyInfo[] FilterOnlyGetProperties(Object obj)
         {

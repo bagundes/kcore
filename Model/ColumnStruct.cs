@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace KCore.Model
+﻿namespace KCore.Model
 {
-    public class ColumnStruct : Base.BaseModel
+    public class ColumnStruct : Base.BaseModel_v1
     {
         public string DBase { get; private set; }
         public string Table { get; private set; }

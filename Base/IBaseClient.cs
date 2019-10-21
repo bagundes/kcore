@@ -1,7 +1,5 @@
 ﻿using KCore.Model;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace KCore.Base
 {
@@ -12,12 +10,13 @@ namespace KCore.Base
         int FieldCount { get; }
         string LastCommand { get; }
         DataInfo DataInfo { get; }
+        C.Database.ClientType ClientType { get; }
         #endregion
 
         void Connect();
         void Connect(string dbase);
-        void Connect(DataInfo connDetails);
-        void Connect(Credential2 cred);
+        void Connect(DataInfo dataInfo);
+        void Connect(Credential_v2 cred);
 
         #region Execute
         bool DoQuery(string sql, params dynamic[] values);
@@ -44,12 +43,11 @@ namespace KCore.Base
         #region Check
         bool HasDatabase(string name);
         bool HasTable(string database, string table);
-        bool HasColumn(string database, string table, string column);
         #endregion
 
         #region Properties
         int Version();
-        ColumnStruct[] Columns(string dsource, string table);
+        ColumnStruct[] Columns(string table);
         #endregion
     }
 }

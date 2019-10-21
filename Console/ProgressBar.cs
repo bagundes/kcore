@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
@@ -30,7 +29,7 @@ namespace KCore.Console
             // Otherwise, we'll end up with a lot of garbage in the target file.
             //if (!Console.IsOutputRedirected)
             //{
-                ResetTimer();
+            ResetTimer();
             //}
         }
 

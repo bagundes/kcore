@@ -1,17 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-
+using System.Linq;
 namespace KCore.Shell
 {
     public static class File
     {
         public static string LOG => typeof(File).Name;
 
+        /// <summary>
+        /// Create temporary file.
+        /// </summary>
+        /// <returns>Empty file</returns>
+        public static string CreateTempFile()
+        {
+            var ext = "tmp_file";
+            var dir = KCore.Shell.Directory.AppTemp("temporary files");
+            Delete(DateTime.Now.AddDays(-1), dir, $"*.{ext}");
+            var filename = $"{dir}/{KCore.Security.Chars.RandomChars(10)}.{ext}";
+            Save(String.Empty, filename, true, true);
+
+            return filename;
+
+        }
+
         public static string SaveTempDir(string prjName, string line, string filename, bool ovride = false, bool wait = true)
         {
-            filename = $"{KCore.Shell.Directory.Temp(prjName)}/{filename}";
+            filename = $"{KCore.Shell.Directory.AppTemp(prjName)}/{filename}";
             Save(line, filename, ovride, wait);
             return filename;
         }
@@ -29,14 +43,14 @@ namespace KCore.Shell
             var fileInfo = new FileInfo(filename);
             System.IO.Directory.CreateDirectory(fileInfo.DirectoryName);
 
-                var exists = System.IO.File.Exists(filename);
+            var exists = System.IO.File.Exists(filename);
 
             while (wait == true && IsLocked(filename) && exists)
                 System.Threading.Thread.Sleep(2000);
 
             if (ovride)
             {
-                if(WaitUnlocked(filename))
+                if (WaitUnlocked(filename))
                     System.IO.File.WriteAllLines(filename, lines);
             }
             else
@@ -54,6 +68,34 @@ namespace KCore.Shell
         public static void Save(string line, string filename, bool ovride = false, bool wait = false)
         {
             Save(new string[] { line }, filename, ovride, wait);
+        }
+
+        public static string Save(byte[] bytes, string filename, bool replace = false)
+        {
+            if (bytes == null || bytes.Length < 1)
+                throw new Exception("The bytes cannot be empty");
+
+            return Save(new MemoryStream(bytes), filename, replace);
+        }
+
+        public static string Save(Stream stream, string filename, bool replace = true)
+        {
+            var fileInfo = new FileInfo(filename);
+
+            if (stream == null)
+                throw new Exception("The stream is not to be empty");
+
+
+            if (fileInfo.Exists && !replace)
+                return fileInfo.FullName;
+
+            using (var output = new FileStream(fileInfo.FullName, FileMode.OpenOrCreate))
+            {
+                stream.CopyTo(output);
+                stream.Close();
+            }
+
+            return fileInfo.FullName;
         }
         #endregion
 
@@ -76,7 +118,7 @@ namespace KCore.Shell
         public static string ConvertToBase64(string filename)
         {
             byte[] imageArray = System.IO.File.ReadAllBytes(filename);
-           return Convert.ToBase64String(imageArray);
+            return Convert.ToBase64String(imageArray);
         }
 
         #endregion
@@ -127,6 +169,42 @@ namespace KCore.Shell
 
             //arquivo está disponível
             return false;
+        }
+        #endregion
+
+        #region Actions
+        /// <summary>
+        /// Delete files with old last access.
+        /// This delete recursive foldes
+        /// </summary>
+        /// <param name="lastAccess">Date last access</param>
+        /// <param name="path">Path</param>
+        /// <param name="searchPattern">Search pattern</param>
+        public static void Delete(DateTime lastAccess, string path, string searchPattern = "*")
+        {
+            System.IO.Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories)
+                .Select(f => new FileInfo(f))
+                .Where(f => f.LastAccessTime < lastAccess)
+                .ToList()
+                .ForEach(f => f.Delete());
+        }
+
+        /// <summary>
+        /// List the files in the folder
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="searchPattern"></param>
+        /// <param name="lastAccess">last access</param>
+        /// <returns></returns>
+        public static FileInfo[] Files(string path, string searchPattern = "*", DateTime? lastAccess = null)
+        {
+            var access = lastAccess ?? DateTime.Now;
+
+            return System.IO.Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories)
+                .Select(f => new FileInfo(f))
+                .Where(f => f.LastAccessTime < access)
+                .ToList()
+                .ToArray();
         }
         #endregion
 

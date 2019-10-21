@@ -1,10 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Resources;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace KCore.Base
 {
@@ -16,34 +12,35 @@ namespace KCore.Base
         public int Code { get; protected set; }
         public readonly string LogName;
         public override string Message => Dscription();
-
+        public readonly string Tag;
         private dynamic[] Values = new dynamic[0];
-
-
+        
         protected abstract ResourceManager Resx { get; }
         protected abstract int Id { get; }
 
 
-        public BaseException(string log, int code, params dynamic[] values) : base(log)
+        public BaseException(string log, Enum code, params dynamic[] values) : base(log)
         {
             this.LogName = log;
             this.Code = Convert.ToInt32(code);
             this.Values = values;
+            Tag = code.ToString();
             Save();
 
         }
 
-        public BaseException(string log, int code, Exception innerException) : base(log, innerException)
-        {
-            this.LogName = log;
-            this.Code = Convert.ToInt32(code);
-            Save();
-        }
+        //public BaseException(string log, Enum code, Exception innerException) : base(log, innerException)
+        //{
+        //    this.LogName = log;
+        //    this.Code = Convert.ToInt32(code);
+        //    Tag = code.ToString();
+        //    Save();
+        //}
 
-        protected BaseException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-            Save();
-        }
+        //protected BaseException(SerializationInfo info, StreamingContext context) : base(info, context)
+        //{
+        //    Save();
+        //}
 
         protected string Dscription()
         {
@@ -80,16 +77,7 @@ namespace KCore.Base
         {
 
             var debug = new KCore.DebugModel(this);
-            KCore.Stored.Online.Save(debug, this.GetType().Name);
-
-            //var json = Newtonsoft.Json.JsonConvert.SerializeObject(this,
-            //    new JsonSerializerSettings
-            //    {
-            //        ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            //        Formatting = Formatting.None
-            //    });
-
-            //KCore.Stored.Online.Save(this.GetType().Name, json);
+            //KCore.Stored.Online.Save(debug);
         }
     }
 }

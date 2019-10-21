@@ -1,31 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace KCore.Base
 {
-    public abstract class BaseTable : BaseModel
+    /// <summary>
+    /// Base to construct the model table
+    /// </summary>
+    public abstract class BaseTable_v1 : BaseModel_v1
     {
-        public TableInfo TabInfo { get; private set; }
-        public Dictionary<string, KCore.Dynamic> Fields { get; set; }
+        #region Properties
+        /// <summary>
+        /// Information about the table
+        /// </summary>
+        public TableInformation TableInfo { get; private set; }
+        
+        /// <summary>
+        /// Fields
+        /// </summary>
+        public Dictionary<string, KCore.Dynamic> Fields { get; internal set; }
+        public bool IsUpdate => Fields != null && Fields.Count > 0; 
 
-
-
-        //public KCore.Base.BaseTable() { }
-        public BaseTable(string dsource, string table, string[] pKey, bool ai)
+        private String[] _virtualPK;
+        /// <summary>
+        /// Internal Primary Key. If the PK is not defined the model will get PK in TableInfo properties.
+        /// </summary>
+        public String[] VirtualPK
         {
-            TabInfo = new TableInfo(dsource, table, pKey, ai);
+            get
+            {
+                if (_virtualPK == null)
+                    return TableInfo.PKey;
+                else
+                    return _virtualPK;
+            }
+            protected set
+            {
+                _virtualPK = value;
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Base table
+        /// </summary>
+        /// <param name="dbase">Database</param>
+        /// <param name="table">table</param>
+        /// <param name="pKey">primary keys</param>
+        public BaseTable_v1(string dbase, string table, string[] pKey)
+        {
+            TableInfo = new TableInformation(table, pKey, dbase);
         }
 
+        #region Primary key
+
+        /// <summary>
+        /// Get virtual primary key value
+        /// </summary>
+        /// <param name="pk">primary key index</param>
+        /// <returns>Value of primary key</returns>
         public dynamic GetPKeyValue(int pk = 0)
         {
-            return Reflection.GetValue(this, TabInfo.PKey[pk]);
+            return Reflection.GetValue(this, TableInfo.PKey[pk]);
+        }
+        public dynamic GetVirtualPKeyValue(int pk = 0)
+        {
+            return Reflection.GetValue(this, VirtualPK[pk]);
         }
 
+        public void SetVirtualPKeyValue(dynamic value, int pk = 0)
+        {
+            Reflection.SetValue(this, VirtualPK[pk], value);
+        }
+
+        /// <summary>
+        /// Set primary key value
+        /// </summary>
+        /// <param name="val">Value</param>
+        /// <param name="pk">Index</param>
         public void SetPKeyValue(dynamic val, int pk = 0)
         {
-            Reflection.SetValue(this, TabInfo.PKey[pk], val);
+            Reflection.SetValue(this, TableInfo.PKey[pk], val);
         }
+        #endregion
 
         public virtual bool Get(dynamic pKeyValue)
         {
@@ -42,28 +99,63 @@ namespace KCore.Base
             throw new NotImplementedException();
         }
 
-        public void QFields(Dictionary<string,KCore.Dynamic> fields)
+        public override void Load(Dictionary<string, KCore.Dynamic> fields)
         {
             this.Fields = fields;
+            foreach(var prop in KCore.Reflection.FilterOnlySetProperties(this))
+            {
+                var value = this.Fields.Where(t => t.Key.ToUpper() == prop.Name.ToUpper()).Select(t => t.Value.Value).FirstOrDefault();
+                if (value != null)
+                    KCore.Reflection.SetValue(this, prop.Name, value);
+            }
         }
 
-        #region sub-classes
-        public class TableInfo
-        {
-            public string DataSource { get; private set; }
-            public string Table { get; private set; }
-            public string[] PKey { get; private set; }
-            public bool AutoIncrement { get; private set; }
+        public virtual void UpdatePK() {}
 
-            public TableInfo(string dsource, string table, string[] pKey, bool ai = false)
+        #region sub-classes
+
+        /// <summary>
+        /// Table infomation
+        /// </summary>
+        public class TableInformation
+        {
+            /// <summary>
+            /// Table name
+            /// </summary>
+            public string Name { get; private set; }
+            
+            /// <summary>
+            /// Virtual PK
+            /// </summary>
+            public string[] PKey { get; private set; }
+            
+            /// <summary>
+            /// Database name
+            /// </summary>
+            public string DBase { get; internal set; }
+
+            /// <summary>
+            /// Table information
+            /// </summary>
+            /// <param name="table">Table name</param>
+            /// <param name="pKey">The virtual pk</param>
+            public TableInformation(string table, string[] pKey, string dbase)
             {
-                this.Table = table;
+                this.DBase = dbase;
+                this.Name = table;
                 this.PKey = pKey;
-                this.DataSource = dsource;
-                AutoIncrement = ai;
+            }
+
+            /// <summary>
+            /// Change the database information
+            /// </summary>
+            /// <param name="newdbase"></param>
+            public void ChangeDatabase(string newdbase)
+            {
+                this.DBase = newdbase;
             }
         }
         #endregion
 
-}
+    }
 }

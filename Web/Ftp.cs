@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Net;
-using System.Text;
 
 namespace KCore.Web
 {
@@ -10,9 +7,9 @@ namespace KCore.Web
     {
 
         public double Percent { get; internal set; }
-        public KCore.Model.Credential2 cred { get; internal set; }
+        public KCore.Model.Credential cred { get; internal set; }
 
-        public Ftp(KCore.Model.Credential2 cred)
+        public Ftp(KCore.Model.Credential cred)
         {
             this.cred = cred;
         }
@@ -33,8 +30,8 @@ namespace KCore.Web
             if (subpath.Contains("ftp://"))
                 return;
 
-            var  request = (FtpWebRequest)WebRequest.Create($"ftp://{cred.Host}/{subpath}/{file.Name}.{file.Extension}");
-            
+            var request = (FtpWebRequest)WebRequest.Create($"ftp://{cred.Host}/{subpath}/{file.Name}.{file.Extension}");
+
 
             request.Credentials = new NetworkCredential(cred.User, cred.GetPasswd());
             request.Method = WebRequestMethods.Ftp.UploadFile;
@@ -62,14 +59,14 @@ namespace KCore.Web
         }
 
 
-        public static bool TestConn(Model.Credential2 cred)
+        public static bool TestConn(Model.Credential cred)
         {
             var request = (FtpWebRequest)WebRequest.Create($"ftp://{cred.Host}/");
             request.Credentials = new NetworkCredential(cred.User, cred.GetPasswd());
             request.Method = WebRequestMethods.Ftp.ListDirectory;
             using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
                 return true;
-            
+
         }
     }
 }

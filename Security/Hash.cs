@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
 
 namespace KCore.Security
 {
     public static class Hash
     {
         private static string LOG => typeof(Hash).Name;
+        private const string SIGN = "@";
 
         /// <summary>
         /// Create Unique Identify to values.
@@ -25,49 +26,60 @@ namespace KCore.Security
             return id;
         }
 
-        #region Password
+        #region Crypt
         /// <summary>
-        /// Create the key with internal rules.
+        /// Transform value in Token using the masterkey default.
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="passwd"></param>
-        /// <returns></returns>
-        public static string PasswdToKey(string user, string passwd)
+        /// <param name="value">Convert value to token</param>
+        /// <returns>Token encoded url string</returns>
+        public static string ValueToToken(string value)
         {
-            user = Chars.StringMixer(true, user);
-            return Encrypt1(passwd, user);
+            var token = Encrypt(value, R.Security.MasterKey);
+            return HttpUtility.UrlEncode(token);
         }
 
         /// <summary>
-        /// Restore the password with internal rules
+        /// Restore the token to value.
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public static string KeyToPasswd(string user, string key)
+        /// <param name="token">Convert token to value</param>
+        /// <returns>Value</returns>
+        public static string TokenToValue(string token)
         {
-            try
-            {
-                user = Chars.StringMixer(true, user);
-                return Decrypt1(key, user);
-            }
-            catch (Exception ex)
-            {
-                KCore.Diagnostic.Error(R.ID, LOG, ex.Message, ex.StackTrace, ex.Source);
-                throw new KCoreException(LOG, C.MessageEx.ItNotPossibleDecrypt_8_1, key);
-            }
+            if (!token.StartsWith(SIGN) || !token.EndsWith(SIGN))
+                token = HttpUtility.UrlDecode(token);
+            return Decrypt(token, R.Security.MasterKey);
         }
         #endregion
 
         #region Simple crypto
-        public static string Encrypt(string value, string masterkey = null)
+        /// <summary>
+        /// Encrypt the value using the key.
+        /// </summary>
+        /// <param name="value">Value to encrypt</param>
+        /// <param name="key"><Key to encrypt</param>
+        /// <returns>The value encrypted will be url enconde</returns>
+        public static string Encrypt(string value, string key)
         {
-            return PasswdToKey(masterkey ?? R.Security.MasterKey, value);
+            return $"{SIGN}{Encrypt1(value, key)}{SIGN}";
         }
 
-        public static string Decrypt(string key, string masterkey = null)
+        /// <summary>
+        /// Decrypt the value using the key.
+        /// </summary>
+        /// <param name="value">Value to encrypt</param>
+        /// <param name="key"><Key to encrypt</param>
+        /// <returns></returns>
+        public static string Decrypt(string value, string key)
         {
-            return KeyToPasswd(masterkey ??  R.Security.MasterKey, key);
+            if (value.Contains(System.Environment.NewLine))
+                value = value.Replace(System.Environment.NewLine, null);
+
+            if (!value.StartsWith(SIGN) || !value.EndsWith(SIGN))
+                throw new System.FormatException($"The value needs to starting and ending with \"{SIGN}\" sign");
+            else
+                value = value.Substring(SIGN.Length, value.Length - SIGN.Length - 1);
+
+            return Decrypt1(value, key);            
         }
         #endregion
 
@@ -79,12 +91,12 @@ namespace KCore.Security
         /// <returns></returns>
         public static string UniqueHash(params object[] values)
         {
-            return MD5(values, R.Security.MasterKey);
+            return HttpUtility.UrlEncode(MD5(values, R.Security.MasterKey));
         }
 
-        public static string Token(params object[] values)
+        public static string UniqueToken(params object[] values)
         {
-            return SHA512(values, R.Security.MasterKey);
+            return HttpUtility.UrlEncode(SHA512(values, R.Security.MasterKey));
         }
 
         /// <summary>
@@ -199,12 +211,12 @@ namespace KCore.Security
 
         #region Encrypton Expert
         /// <summary>
-        /// Encrypt the input value
+        /// Encrypt the input value.
         /// </summary>
         /// <param name="input">Value to encrypt</param>
         /// <param name="key">Key to decrypt</param>
-        /// <returns></returns>
-        public static string Encrypt1(object input, string key = null)
+        /// <returns>The value will return with start and end at sign</returns>
+        private static string Encrypt1(object input, string key)
         {
             if (input == null)
                 return null;
@@ -223,12 +235,12 @@ namespace KCore.Security
         }
 
         /// <summary>
-        /// Decrypto the string
+        /// Decrypto the string.
         /// </summary>
-        /// <param name="input">Encrypt value</param>
+        /// <param name="input">Encrypt value. The value needs start and end with sign</param>
         /// <param name="key">Key to decrypt</param>
         /// <returns></returns>
-        public static string Decrypt1(object input, string key = null)
+        private static string Decrypt1(string input, string key)
         {
             key = key ?? R.Security.MasterKey;
             var byte24 = MD5(key).Substring(0, 24);

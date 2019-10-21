@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace KCore.Shell
@@ -19,10 +17,11 @@ namespace KCore.Shell
         {
             var names = name.Split(' ');
 
-            if(names.Length > 1)
+            if (names.Length > 1)
             {
                 return names[0].ToString().ToUpper() + names[names.Length - 1].ToString().ToUpper();
-            } else
+            }
+            else
                 return name[0].ToString().ToUpper() + name[1].ToString().ToLower();
         }
 
@@ -37,7 +36,7 @@ namespace KCore.Shell
             var name = obj.GetType() == typeof(string) ? obj.ToString() : obj.GetType().Name;
             var res = String.Empty;
 
-            for(int i = 0; i < name.Length; i++)
+            for (int i = 0; i < name.Length; i++)
             {
                 var c = name[i].ToString().ToLower();
 
@@ -66,7 +65,7 @@ namespace KCore.Shell
             var hex = String.Empty;
             var regex = new Regex("[0-9ABCDEFabcdefXx]");
 
-            for(int i = start; i < text.Length; i++)
+            for (int i = start; i < text.Length; i++)
             {
                 if (regex.IsMatch(text[i].ToString()))
                     hex += text[i];
@@ -77,5 +76,27 @@ namespace KCore.Shell
             return hex;
 
         }
+
+        //public static string RemoveDuplicateChars(string key, char character)
+        //{
+        //    string res = String.Empty;
+        //    bool ischaracter = false;
+        //    for(int i = 0; i < key.Length; i++)
+        //    {
+        //        if(key[i] == character)
+        //    }
+
+        //    foreach (char value in key)
+        //    {
+        //        // See if character is in the table.
+        //        if (table.IndexOf(value) == -1)
+        //        {
+        //            // Append to the table and the result.
+        //            table += value;
+        //            result += value;
+        //        }
+        //    }
+        //    return result;
+        //}
     }
 }

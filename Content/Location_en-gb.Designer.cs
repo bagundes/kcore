@@ -149,5 +149,14 @@ namespace KCore.Content {
                 return ResourceManager.GetString("M00010_1", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The invalid credential..
+        /// </summary>
+        internal static string M00011_0 {
+            get {
+                return ResourceManager.GetString("M00011_0", resourceCulture);
+            }
+        }
     }
 }

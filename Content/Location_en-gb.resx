@@ -148,4 +148,7 @@
   <data name="M00010_1" xml:space="preserve">
     <value>Error: {0}</value>
   </data>
+  <data name="M00011_0" xml:space="preserve">
+    <value>The invalid credential.</value>
+  </data>
 </root>

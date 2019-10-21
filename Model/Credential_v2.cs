@@ -6,25 +6,29 @@ using System.Linq;
 
 namespace KCore.Model
 {
+    [Obsolete]
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class Credential2 : Base.BaseModel
+    public sealed class Credential_v2 : Base.BaseModel_v1
     {
+        public override int Version => 2;
         public override string LOG => "Credential";
         public static string Folder => R.Project.Folders.Credential;
         public static int Expire => R.Security.Expire;
 
-    [JsonProperty]
+        #region Information about location
+        [JsonProperty]
+        /// <summary>
+        /// The host is connected the credential
+        /// </summary>
+        public string Host { get; internal set; }
+        [JsonProperty]
         /// <summary>
         /// The instance name or location the application is working
         /// </summary>
-        public string Instance { get;  internal set; }
+        public string Instance { get; internal set; }
+        #endregion
 
-        [JsonProperty]
-        /// <summary>
-        /// The host is connected the application
-        /// </summary>
-        public string Host { get; internal set; }
-
+        #region Login
         [JsonProperty]
         /// <summary>
         /// User name to login
@@ -33,7 +37,7 @@ namespace KCore.Model
 
         [JsonProperty]
         /// <summary>
-        /// User id
+        /// Unique Identification
         /// </summary>
         public int UId { get; internal set; }
 
@@ -43,22 +47,38 @@ namespace KCore.Model
         /// </summary>
         public string UserKey => key ?? Security.Hash.MD5(User, Host, Instance);
         private string key = null;
+        #endregion
+
+        #region Properties
+        [JsonProperty]
+        public DateTime Created;
+        [JsonProperty]
+        public DateTime LastUpdate { get; internal set; }
+        #endregion
+
+        #region Security
+        [JsonProperty]
+        public string CryptPasswd { get; internal set; }
+        #endregion
+
+
 
         [JsonProperty]
         /// <summary>
         /// Add personal properties
         /// </summary>
-        public Dictionary<string,Dynamic> Properties { get; internal set; }
+        public Dictionary<string, Dynamic> Properties { get; internal set; }
+
+
+        
+
+        
+
+        
 
 
 
-        [JsonProperty]
-        public DateTime Created;
 
-        [JsonProperty]
-        public string CryptPasswd { get; internal set; }
-
-        public DateTime LastUpdate { get; internal set; }
         public string Token
         {
             get
@@ -66,7 +86,7 @@ namespace KCore.Model
                 if (LastUpdate.AddMinutes(Expire) < DateTime.Now)
                     throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
                 else
-                    return KCore.Security.Hash.PasswdToKey(key, Serialize());
+                    return KCore.Security.Hash.Encrypt(Serialize(), key);
             }
         }
 
@@ -78,7 +98,7 @@ namespace KCore.Model
         /// <param name="instance">local machine</param>
         /// <param name="userKey">specific user key</param>
         /// <param name="uid">unique id</param>
-        public Credential2(string user, string host, string instance, string userKey = null, int uid = -1)
+        public Credential_v2(string user, string host, string instance, string userKey = null, int uid = -1)
         {
             this.User = user;
             this.Host = host;
@@ -90,35 +110,34 @@ namespace KCore.Model
         }
 
         [JsonConstructor]
-        public Credential2(string userKey, string host)
+        public Credential_v2(string userKey, string host)
         {
             Load(userKey, host);
         }
 
         public string SetPassword(string passwd)
         {
-            CryptPasswd = Security.Hash.PasswdToKey(UserKey, passwd);
+            CryptPasswd = Security.Hash.Encrypt(passwd, UserKey);
             return UserKey;
         }
 
         public string GetPasswd()
         {
-            return Security.Hash.KeyToPasswd(UserKey, CryptPasswd);
+            return Security.Hash.Decrypt(CryptPasswd, UserKey);
         }
 
         public string Save()
         {
-            var foo = KCore.Security.Hash.MD5(key, R.Security.MasterKey);
-            var file = $"{Folder}\\{foo}.credential";
-            
-            
+            var file = $"{Folder}\\{key}.credential";
+
+
             KCore.Shell.File.Save(Token, file, true, true);
             return Token;
         }
 
         public override string Serialize()
         {
-            
+
             var bar = new PersonalSerialize
             {
                 user = this.User,
@@ -138,6 +157,10 @@ namespace KCore.Model
         {
             var foo = KCore.Security.Hash.MD5(key, R.Security.MasterKey);
             var file = new FileInfo($"{Folder}/{foo}.credential");
+
+            if (!file.Exists)
+                throw new KCoreException(LOG, C.MessageEx.InvalidCredential11_0, file);
+
             this.key = key;
             LastUpdate = file.LastAccessTime;
 
@@ -145,7 +168,7 @@ namespace KCore.Model
                 throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
 
             string text = System.IO.File.ReadAllText(file.ToString());
-            var json = KCore.Security.Hash.KeyToPasswd(UserKey, text);
+            var json = KCore.Security.Hash.Decrypt(text, UserKey);
             var cred = Newtonsoft.Json.JsonConvert.DeserializeObject<PersonalSerialize>(json);
 
 #if !DEBUG
@@ -187,6 +210,16 @@ namespace KCore.Model
             var file = new FileInfo($"{Folder}/{foo}.credential");
             System.IO.File.Delete(file.ToString());
         }
+
+        /// <summary>
+        /// Clone the credential with new key and host
+        /// </summary>
+        /// <param name="userKey">New key</param>
+        public Credential_v2 Clone(string userKey)
+        {
+            return new Credential_v2(this.User, this.Host, this.Instance, userKey, this.UId);
+        }
+
         private class PersonalSerialize
         {
             public string user;

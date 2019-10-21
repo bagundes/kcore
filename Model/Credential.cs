@@ -1,160 +1,330 @@
-﻿using Newtonsoft.Json;
+﻿using KCore.Lists;
+using KCore.Stored;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Text;
+using System.IO;
+using System.Linq;
 
 namespace KCore.Model
 {
+    /// <summary>
+    /// Credential - Version 3.
+    /// Credential may expire in two ways, time of uselessness or due date.
+    /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public sealed class Credential : Base.BaseModel
     {
-        [JsonProperty]
-        public string User { get; internal set; }
+        #region Headers
+        [JsonIgnoreAttribute]
+        public override int Version => 3;
+        [JsonIgnoreAttribute]
+        public new string LOG => "Credential";
+        private string Folder => R.Project.Folders.Credential;
+        #endregion
 
-        [JsonProperty]
+        public string Id { get; internal set; }
+        private string extension => $"crdv{Version}".ToLower();
+        private List<string> role;
+
         /// <summary>
-        /// User Id - This is optional field
+        /// Expire after N minutes
         /// </summary>
-        public int UserId { get; set; }
+        private int Expire = R.Security.Expire;       
 
-        private string InternalKey => Security.Hash.MD5(User, Uid, Instance);
-  
+        #region Information about location
         /// <summary>
-        /// Password encrypted
+        /// The host is connected the credential
         /// </summary>
-        public string PwdKey { get; internal set; }
-
-        #region Optinal properties
-        [JsonProperty]
-        public string Uid { get; internal set; }
-        public string Token
-        {
-            get
-            {
-                if (Expire < DateTime.Now)
-                    throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
-                else
-                    return KCore.Security.Hash.PasswdToKey(Instance, ToJson());
-            }
-        }
-        [JsonProperty]
-        public DateTime Expire { get; set; } = DateTime.Now.AddMinutes(R.Security.Expire);
-        public string Instance { internal set;  get; }
         public string Host { get; internal set; }
 
-
-        #endregion
         /// <summary>
-        /// Credential
+        /// The instance name or location the application is working
         /// </summary>
-        /// <param name="user">User name</param>
-        /// <param name="mkey">Master key to encrypt (example OUSR.PASSWD)</param>
-        /// <param name="host">The company/database/server</param>
-        /// <param name="instance">Machine name or ip</param>
-        public Credential(string user, string mkey, string host, string instance = null)
+        public string Instance { get; internal set; }
+        #endregion
+
+        #region Login
+        /// <summary>
+        /// User name to login
+        /// </summary>
+        public string User { get; internal set; }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Add personal properties
+        /// </summary>
+        public MyDictionary Properties = new MyDictionary();
+
+        /// <summary>
+        /// Due date
+        /// </summary>
+        public DateTime DueDate { get; internal set; }
+
+        /// <summary>
+        /// Roles to this credentials.
+        /// </summary>
+        public string[] Roles => role != null ? role.ToArray() : new string[0] { };
+
+        /// <summary>
+        /// The key to encrypt the information about Credential.
+        /// </summary>
+        private string Security => KCore.Security.Hash.MD5(User, Host, Instance, KCore.R.Security.MasterKey);
+        #endregion
+
+        #region Security
+        /// <summary>
+        /// Token created using the internal information.
+        /// If you add or change the any information in the credential.
+        /// </summary>
+        private string InternalToken;
+        #endregion
+
+        /// <summary>
+        /// Create the credential with random password.
+        /// </summary>
+        /// <param name="host">host</param>
+        /// <param name="instance">local machine</param>
+        /// /// <param name="user">user</param>
+        public Credential(string host, string instance, string user)
         {
             this.User = user;
-            this.Instance = instance ?? Dns.GetHostEntry(Environment.MachineName).HostName;
-            this.Uid = SetUid(user + mkey + host);
             this.Host = host;
+            this.Instance = instance;
+            //this.lastModified = DateTime.Now;
+            this.SetPassword(KCore.Security.Chars.RandomChars(8, true));
+            this.Id = Security;
+            this.DueDate = DateTime.Now.AddMinutes(Expire);
         }
 
         /// <summary>
-        /// Credential
+        /// Load the credential.
         /// </summary>
-        /// <param name="token"></param>
-        /// <param name="instance"></param>
-        public Credential(string token, string instance)
+        /// <param name="key">Key to access the credential</param>
+        public Credential(string key)
         {
-            try
-            {
-                var obj = KCore.Security.Hash.KeyToPasswd(instance, token);
-                var val = Newtonsoft.Json.JsonConvert.DeserializeObject<Serialize>(obj);
+            string id = null;
+            if (key.StartsWith("@") && key.EndsWith("@"))
+                id = KCore.Security.Hash.TokenToValue(key);
+            else
+                id = IdToKey(key);
 
-                if (this.Expire < DateTime.Now)
+            var file = new FileInfo($"{Folder}/{id}.{extension}");
+
+            if (!file.Exists)
+                throw new KCoreException(LOG, C.MessageEx.InvalidCredential11_0);
+
+            string text = System.IO.File.ReadAllText(file.ToString());
+            string json;
+            if (!KCore.R.IsDebugMode)
+                json = KCore.Security.Hash.Decrypt(text, id);
+            else
+                json = text;
+
+            #region Loading
+            var cred = Newtonsoft.Json.JsonConvert.DeserializeObject<PersonalSerialize>(json);
+            this.Id = cred.id;
+            this.Host = cred.host;
+            this.Instance = cred.instance;
+            this.User = cred.user;
+            this.InternalToken = cred.internalToken;
+            this.DueDate = cred.duedate;
+            this.Expire = cred.expire;
+            this.Properties =  new MyDictionary(cred.properties);
+            this.role = cred.roles;
+            #endregion
+
+            var lastAccess = file.LastAccessTime;
+            if (Expire == -1)
+            {
+                if (DueDate < DateTime.Now)
+                {
+                    DestroySession();
                     throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
-
-                this.User = val.user;
-                SetPwdKey(val.pwdkey);
-                this.Uid = val.uid;
-                this.Expire = val.expire;
-                this.Instance = val.instance;
-                this.Host = val.host;
-                this.UserId = val.userid;
-                
-            }catch(Exception ex)
+                }
+            }
+            else if (lastAccess.AddMinutes(Expire) < DateTime.Now)
             {
-                var id = KCore.Diagnostic.Track(LOG, $"Machine:{instance}", $"Token:{token}", ex.Message);
-                KCore.Diagnostic.Error(R.ID, LOG, id, "Error when application tried to read token.");
+                DestroySession();
                 throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
             }
-
         }
 
         /// <summary>
-        /// Set the password.
+        /// Add due date on credential
+        /// </summary>
+        public void AddDueDate(DateTime duedate)
+        {
+            Expire = -1;
+            DueDate = duedate;
+        }
+
+        public string GetKey() => KCore.Security.Hash.ValueToToken(Id);
+
+        #region Password
+        /// <summary>
+        /// Set the password
         /// </summary>
         /// <param name="passwd">Password</param>
-        /// <returns>Key</returns>
-        public string SetPasswd(string passwd)
+        public void SetPassword(string passwd)
         {
-            this.PwdKey = Security.Hash.PasswdToKey(InternalKey, passwd);
-            return this.PwdKey;
-        }
 
-        public string GetPasswd()
-        {
-            if (Expire > DateTime.Now)
-                return Security.Hash.KeyToPasswd(InternalKey, PwdKey);
-            else
-                throw new KCoreException(LOG, C.MessageEx.LoginExpired6_0);
-        }
-
-        public void SetPwdKey(string pwdkey)
-        {
-            if (!pwdkey.EndsWith("="))
-                throw new KCoreException(LOG, C.MessageEx.InvalidPwdKey7_0);
-            else
-                this.PwdKey = pwdkey;
+            InternalToken = KCore.Security.Hash.Encrypt(passwd, Security);
         }
 
         /// <summary>
-        /// Create the unique identification
+        /// Get the password
         /// </summary>
-        /// <param name="key">Fixed value (example: OUSR.PASSWORD)</param>
-        private string SetUid(string id)
+        /// <returns></returns>
+        public string GetPasswd()
         {
-            this.Uid = Security.Hash.MD5(User, id);
-            return this.Uid;
+            return KCore.Security.Hash.Decrypt(InternalToken, Security);
+        }
+        #endregion
+
+        #region Save      
+        /// <summary>
+        /// Save the credential using Id.
+        /// </summary>
+        /// <returns>Key</returns>
+        public string Save()
+        {
+            var file = $"{Folder}\\{Id}.{extension}";
+            string json;
+            if (!KCore.R.IsDebugMode)
+                json = KCore.Security.Hash.Encrypt(Serialize(), Id);
+            else
+                json = Serialize();
+
+            KCore.Shell.File.Save(json, file, true, true);
+            return GetKey();//KCore.Security.Hash.ValueToToken(Id);
         }
 
-        public override string ToJson()
+        /// <summary>
+        /// Add role name
+        /// </summary>
+        /// <param name="name"></param>
+        public void AddRole(string name)
         {
-            var foo = new Serialize
+            name = name.ToLower().Trim();
+            if (role == null)
+                role = new List<string>();
+
+            if (!ExistsRole(name))
+                role.Add(name);
+        }
+
+        /// <summary>
+        /// Verify if role exists
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool ExistsRole(string name)
+        {
+            name = name.ToLower().Trim();
+            if (role == null)
+                return false;
+            else
+                return role.Where(t => t.Equals(name, StringComparison.InvariantCultureIgnoreCase)).Any();
+        }
+
+        /// <summary>
+        /// Serealize this object
+        /// </summary>
+        /// <returns></returns>
+        private new string Serialize()
+        {
+            var ps = new PersonalSerialize
             {
-                user = User,
-                pwdkey = PwdKey,
-                uid = Uid,
-                expire = Expire,
-                instance = Instance,
+                id = Id,
                 host = Host,
-                userid = UserId,
+                instance = Instance,
+                user = User,
+                internalToken = InternalToken,
+                properties = Properties,
+                duedate = DueDate,
+                roles = role,
+                expire = Expire,
             };
 
-            return Newtonsoft.Json.JsonConvert.SerializeObject(foo);
+            return Newtonsoft.Json.JsonConvert.SerializeObject(ps);
+        }
+        #endregion
+
+        /// <summary>
+        /// Destroy the sassion saved
+        /// </summary>
+        public void DestroySession()
+        {
+            var file = new FileInfo($"{Folder}/{Id}.credential");
+            System.IO.File.Delete(file.ToString());
         }
 
-        class Serialize
+        #region Convert
+#pragma warning disable CS0612 // Type or member is obsolete
+        /// <summary>
+        /// Convert to old class version
+        /// </summary>
+        public Credential_v2 ToV2()
+
         {
+            var credv2 = new Credential_v2(User, Host, Instance, Security, Properties.Get("OUSR.USERID").ToInt(-1));
+            credv2.SetPassword(GetPasswd());
+            foreach (var p in Properties)
+                credv2.SetProperty(p.Key, p.Value);
+
+            return credv2;
+        }
+#pragma warning restore CS0612 // Type or member is obsolete
+
+        /// <summary>
+        /// Create datainfo model.
+        /// Host => Server
+        /// Instance => Schema
+        /// User => User
+        /// Password => Password
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public DataInfo ToDataInfo(C.Database.DBaseType type)
+        {
+            return new DataInfo(Host, Instance, User, GetPasswd(), type);
+        }
+
+        /// <summary>
+        /// Force a new Id.
+        /// </summary>
+        /// <param name="new_id">new id will create using md5 hash</param>
+        public void SetId(string new_id)
+        {
+            this.Id = KCore.Security.Hash.MD5(new_id);
+        }
+
+        /// <summary>
+        /// Convert you Id to key
+        /// </summary>
+        /// <param name="my_id">Id setted setId method</param>
+        /// <returns></returns>
+        public static string IdToKey(string my_id)
+        {
+            var id = KCore.Security.Hash.MD5(my_id);
+            return KCore.Security.Hash.ValueToToken(id);
+        }
+
+        #endregion
+        private class PersonalSerialize
+        {
+            public string id;
             public string user;
-            public string pwdkey;
-            public string uid;
-            public DateTime expire;
             public string instance;
             public string host;
-            public int userid;
-
+            public string internalToken;
+            public DateTime duedate;
+            public int expire;
+            public Dictionary<string, dynamic> properties;
+            public List<string> roles;
         }
+
     }
 }

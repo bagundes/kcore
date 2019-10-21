@@ -1,15 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace KCore.Shell
 {
     public static class Directory
     {
-        public static string Temp(string prjName, params string[] folders)
+        /// <summary>
+        /// Create a new folder in temporary application folder.
+        /// The old files will be deleted automatically.
+        /// </summary>
+        /// <param name="prjName">Project name</param>
+        /// <param name="folders">sub folders to create</param>
+        /// <returns>path</returns>
+        public static string AppTemp(string prjName, params string[] folders)
         {
             var dir = $"{System.IO.Path.GetTempPath()}{R.Company.Name}\\{prjName.ToString()}\\{System.IO.Path.Combine(folders)}";
+            KCore.Shell.File.Delete(DateTime.Now.AddMinutes(-R.Security.TempFilesTimeToDelete), dir);
             return System.IO.Directory.CreateDirectory(dir).FullName;
+        }
+
+        public static string Create(params string[] dir)
+        {
+            var foo = String.Join("\\", dir);
+            //foo = foo.Replace("/", "\\");
+            //foo = 
+
+            System.IO.Directory.CreateDirectory(foo);
+            return foo;
         }
 
         public static string AppData(string prjName, params string[] folders)
@@ -22,5 +38,6 @@ namespace KCore.Shell
 
             //return new System.IO.DirectoryInfo(path);
         }
+
     }
 }

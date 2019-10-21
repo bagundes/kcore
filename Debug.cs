@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace KCore
 {
@@ -11,41 +9,46 @@ namespace KCore
         /// </summary>
         /// <param name="ex"></param>
         /// <param name="table"></param>
-        public static void Save(Exception ex, string table = null)
+        public static void Save(Exception ex)
         {
             var model = new DebugModel(ex);
-            if (!String.IsNullOrEmpty(table))
-                model.table = table;
-
-            KCore.Stored.Online.Save(model, model.table);
+            KCore.Stored.Online.Save(model);
         }
 
         public static void Save(string message)
         {
-            
+            var model = new DebugModel(message);
+            KCore.Stored.Online.Save(model);
         }
-      
+
     }
 
     public sealed class DebugModel : KCore.Base.BaseModel
     {
+        #region properties
+        private string _logName;
+        public override string LOG => _logName;
 #if DEBUG
         public bool DebugMode = true;
 #else
         public bool DebugMode = false;
 #endif
-
-        public string table;
         public DebugModel inner;
         public string message;
         public string trace;
         public int hresult;
         public string source;
         //public string target;
+        #endregion
+
+        public DebugModel(string message)
+        {
+            this.message = message;
+        }
 
         public DebugModel(Exception ex)
         {
-            this.table = ex.GetType().Name;
+            _logName = ex.GetType().FullName;
             this.message = ex.Message;
             this.trace = ex.StackTrace;
             this.hresult = ex.HResult;
@@ -54,8 +57,6 @@ namespace KCore
 
             if (ex.InnerException != null)
                 this.inner = InnerException(ex.InnerException);
-
-            this.Id = KCore.Security.Hash.MD5(this);
         }
 
         private DebugModel InnerException(Exception inner)

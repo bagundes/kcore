@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Net;
+using System.Net.Sockets;
 
 namespace KCore.Shell
 {
@@ -9,6 +8,20 @@ namespace KCore.Shell
         public static string Name()
         {
             return System.Environment.MachineName;
+        }
+
+        public static string IP()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+
+            return null;
         }
 
     }

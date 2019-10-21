@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 namespace KCore
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public partial class Dynamic : Base.BaseModel
+    public partial class Dynamic : Base.BaseModel_v1
     {
         [JsonProperty]
         public readonly dynamic Value;
@@ -26,7 +26,9 @@ namespace KCore
         /// This flag it's only for you control (Example to define a special or defaul value).
         /// </summary>
         public dynamic Flag { get; set; }
+
         private int _lenght;
+        
         /// <summary>
         /// Inform type o value. It's possible to force the type using the FormceType method
         /// </summary>
@@ -161,6 +163,7 @@ namespace KCore
             || String.IsNullOrEmpty(Value.ToString())
             || String.IsNullOrWhiteSpace(Value.ToString());
 
+        public bool HasValue() => !IsEmpty();
         public int Length()
         {
             if (_lenght == 0)
@@ -244,7 +247,7 @@ namespace KCore
             var ci = CultureInfo.GetCultureInfo(lng.ToString().Replace('_', '-'));
 
             var price = ToDouble();
-            if(symbolend)
+            if (symbolend)
                 return price.ToString("#,##0.00" + symbol, ci);
             else
                 return price.ToString(symbol + " #,##0.00", ci);
@@ -302,6 +305,14 @@ namespace KCore
 
             }
         }
+
+        public T ToEnum<T>() where T : System.Enum
+        {
+            if (((int)Type) > 6 && ((int)Type) < 13)
+                return (T)Enum.ToObject(typeof(T), ToInt());
+            else
+                return (T)Enum.Parse(typeof(T), ToString(), true);
+        }
         public char ToBoolChar(char yes = 'Y', char no = 'N')
         {
             return ToBool(yes.ToString()) ? yes : no;
@@ -330,7 +341,7 @@ namespace KCore
                 return val;
             }
             catch
-            {   
+            {
                 return ifnull;
             }
         }
@@ -394,9 +405,9 @@ namespace KCore
             else
                 return DateTime.ParseExact(Value.ToString(), format, System.Globalization.CultureInfo.InvariantCulture);
         }
-        public Model.Select Select(bool @default)
+        public Model.Select_v1 Select(bool @default)
         {
-            return new Model.Select(Value, Text, @default);
+            return new Model.Select_v1(Value, Text, @default);
         }
         #endregion
 

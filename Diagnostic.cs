@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace KCore
 {
@@ -25,7 +23,7 @@ namespace KCore
         public static int Track(string LOG, params string[] values)
         {
             var id = Security.Hash.CreateIdNumber(values);
-            var url = $"{Shell.Directory.Temp("track")}{id.ToString("000000")}_{LOG.ToLower()}.log";
+            var url = $"{Shell.Directory.AppTemp("track")}{id.ToString("000000")}_{LOG.ToLower()}.log";
             Shell.File.Save(values, url, true, false);
 
             return id;
@@ -97,7 +95,7 @@ namespace KCore
             var time = DateTime.Now.ToString("HH:mm:ss");
             lines[0] = $"{time} {type} - {id}.{log}: {lines[0]}";
 
-            var url = $"{Shell.Directory.Temp("logs")}\\{DateTime.Now.ToString("yyMMdd_HH")}00.log";
+            var url = $"{Shell.Directory.AppTemp("logs")}\\{DateTime.Now.ToString("yyMMdd_HH")}00.log";
             Shell.File.Save(lines, url, false, false);
         }
 

@@ -2,123 +2,140 @@
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
+using System.IO;
+using System.Text;
 
 namespace KCore.Base
 {
-    public interface IBaseModel
+    public interface IBaseModel : ICloneable
     {
-        Model.Select[] ToSelect();
-        object ToJsonObject();
+        string ToXml(string filename = null, bool encrypt = false);
         string ToJson();
-        string ToXML();
-        object Response();
-        T Clone<T>() where T : BaseModel;
+        string Serialize();
+
+        Lists.SelectList ToSelect();
     }
 
+
+    [Serializable()]
+    [JsonObject(MemberSerialization.OptOut)]
     public abstract class BaseModel : BaseClass, IBaseModel
     {
-        public string Id;
-        public int updated;
-        public DateTime? lastModified;
+        public virtual string Id => KCore.Security.Hash.MD5(this);
+        public int Updated { get; set; }
 
         /// <summary>
-        /// Transform all model properties to select model
+        /// Transform all model properties and fields to select model
         /// </summary>
         /// <returns></returns>
-        public virtual Model.Select[] ToSelect()
+        public virtual Lists.SelectList ToSelect()
         {
-            //TODO - @blf - I need to create the recursive method when the property is other object
-            var res = new List<Model.Select>();
-            var name = this.GetType().Name;
+            var list = new Lists.SelectList();
+
+            foreach (var proper in Reflection.GetFields(this))
+            {
+                var val = proper.GetValue(this);
+                if (val != null && val.GetType() == typeof(Lists.MyDictionary))
+                {
+                    var mydic = (Lists.MyDictionary)val;
+                    foreach (var v in mydic)
+                        list.Add(v.Value, $"{this.ObjClass}.p.{v.Key}".ToLower());
+                }
+                else
+                    list.Add(proper.GetValue(this), $"{this.LOG}.{proper.Name}".ToLower());
+            }
 
             foreach (var proper in Reflection.FilterOnlyGetProperties(this))
-                res.Add(new Model.Select(proper.GetValue(this), $"{this.LOG}.{proper.Name}".ToLower()));
+                list.Add(proper.GetValue(this), $"{this.LOG}.{proper.Name}".ToLower());
 
-
-            return res.ToArray();
+            return list;
         }
 
-        public virtual object ToJsonObject()
+        /// <summary>
+        /// Serialze the object to json.
+        /// You can overrite this method and serealize with your format.
+        /// </summary>
+        /// <returns></returns>
+        public virtual string Serialize()
         {
-            var foo = Newtonsoft.Json.JsonConvert.SerializeObject(this,
-                new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                    Formatting = Formatting.None
-                });
-
-            return JsonConvert.DeserializeObject(foo);
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
 
-        public virtual string ToJson()
+        /// <summary>
+        /// Serialize the model to xml file.
+        /// </summary>
+        /// <param name="filename">Save in file</param>
+        /// <param name="encrypt">Encrypt file</param>
+        /// <returns>XML format</returns>
+        public virtual string ToXml(string filename = null, bool encrypt = false)
         {
-#if DEBUG
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, 
-                new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                    Formatting = Formatting.None
-                });
 
-#else
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, 
-                new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                    Formatting = Formatting.None
-                });
-#endif
-        }
-        public virtual string ToXML()
-        {
-            using (var stringwriter = new System.IO.StringWriter())
+            using (var ms = new MemoryStream())
             {
-                var serializer = new XmlSerializer(this.GetType());
-                serializer.Serialize(stringwriter, this);
-                return stringwriter.ToString();
+                using (var wfile = new StreamWriter(ms))
+                {
+                    var writer = new System.Xml.Serialization.XmlSerializer(this.GetType());
+
+                    writer.Serialize(wfile, this);
+                    wfile.Close();
+
+                    if (String.IsNullOrEmpty(filename))
+                        System.IO.File.WriteAllBytes(filename, ms.ToArray());
+
+                    if (encrypt)
+                        throw new NotImplementedException("encrypt file was not implemented");
+
+                    return wfile.ToString();
+                }
             }
         }
 
-        public virtual object Response()
+        /// <summary>
+        /// Transform the model to json format.
+        /// </summary>
+        /// <returns>model json format</returns>
+        public virtual string ToJson()
         {
-            return this;
+            var formatting = Formatting.None;
+
+            if (R.IsDebugMode)
+                formatting = Formatting.Indented;
+
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(this,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    Formatting = formatting
+                });
+
+            return json;
         }
 
-        ///// <summary>
-        ///// Load this object with same informartion other object
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="model"></param>
-        //public virtual void Clone<T>(T model) where T : BaseModel
-        //{
-        //    if (!this.Equals(model))
-        //        throw new System.Exception();
-
-        //    foreach (var p in KCore.Reflection.FilterOnlySetProperties(model))
-        //        KCore.Reflection.SetValue(this, p.Name, p.GetValue(model));
-        //}
-
-        //public virtual T Clone<T>() where T : BaseModel, new()
-        //{
-        //    throw new NotImplementedException();
-
-            //var t = (T) Activator.CreateInstance(this.GetType(), new object[] { });
-
-            //foreach (var p in KCore.Reflection.FilterOnlySetProperties(this))
-            //    KCore.Reflection.SetValue(t, p.Name, p.GetValue(p.Name));
-
-            //return new T();
-        //}
-
-        public virtual string Serialize()
-        {
-            throw new System.NotImplementedException(this.LOG);
-        }
-
-        public T Clone<T>() where T : BaseModel
+        /// <summary>
+        /// Clone the model
+        /// </summary>
+        /// <returns>A new model</returns>
+        public virtual object Clone()
         {
             throw new NotImplementedException();
         }
+                       
+        #region Statics method
+        public static T LoadXml<T>(string filename, bool encrypt = false) where T : BaseModel
+        {
+            System.Xml.Serialization.XmlSerializer reader =
+                new System.Xml.Serialization.XmlSerializer(typeof(T));
+            System.IO.StreamReader file = new System.IO.StreamReader(filename);
+            var t = (T)reader.Deserialize(file);
+            file.Close();
+
+            return t;
+        }
+
+        public static T Deserialize<T>(string filename) where T : BaseModel
+        {
+            return LoadXml<T>(filename, true);
+        }
+        #endregion
     }
 }

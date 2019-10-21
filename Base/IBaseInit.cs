@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace KCore.Base
+﻿namespace KCore.Base
 {
     /// <summary>
     /// Interface to init script the project. The Kcore will execute in this order:
@@ -14,6 +10,7 @@ namespace KCore.Base
     /// </summary>
     public interface IBaseInit
     {
+        bool Dependencies();
         bool Construct();
         bool Configure();
         bool Populate();

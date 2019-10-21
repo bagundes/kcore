@@ -1,20 +1,51 @@
-﻿using System;
+﻿using KCore.Model;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Resources;
-using System.Text;
 
 namespace KCore
 {
     public static class R
     {
-        public static string MongoUser => KCore.Security.Hash.Decrypt1(Stored.Cache.Parameters.Get("support").ToString());
+        #region Parameters in the config file
+        public static string CustomerName => KCore.Stored.Cache.Parameters.Get("Customer", "Customer name needs to saves in config file");
+        #endregion
 
+        #region List of projects
+        private static List<Select_v2> _listOfProjects = new List<Select_v2>();
+        /// <summary>
+        /// Register your project here.
+        /// </summary>
+        public static void RegisterProject(int id, string name)
+        {
+            if (_listOfProjects.Where(t => t.value == id).Any())
+                return;
+            else
+                _listOfProjects.Add(new Select_v2(id, name));
+        }
+
+        public static string GetProjectName(int id)
+        {
+            return _listOfProjects.Where(t => t.value == id).Select(t => t.text).FirstOrDefault();
+        }
+        public static List<Select_v2> ListOfProjects => _listOfProjects;
+        #endregion
+
+        #region Database to log files
+        public static string MongoUser => KCore.Security.Hash.TokenToValue(Stored.Cache.Parameters.Get("support").ToString());
+        #endregion
+
+        #region Debug project
 
 #if DEBUG
         public static bool IsDebugMode = true;
 #else
         public static bool IsDebugMode = false;
 #endif
+        #endregion
+
+
         private static string appPath;
 
         public static String AppPath
@@ -48,10 +79,10 @@ namespace KCore
             public static string Namespace => "KC";
             public static Version Version => R.Assembly.GetName().Version;
             public static int ID => Version.Major;
-            
+
             public static class Folders
             {
-                public static string Credential => KCore.Shell.Directory.Temp(Project.Name, "credentials");
+                public static string Credential => KCore.Shell.Directory.AppTemp(Project.Name, "credentials");
             }
         }
         public static class Security
@@ -60,11 +91,13 @@ namespace KCore
             /// <summary>
             /// Expire in minutes
             /// </summary>
-            public const int Expire = 1440;
+            public static int Expire = 1440;
+
             /// <summary>
-            /// Due date in months
+            /// Delete temporary files with N minutes without access.
+            /// Default: 7 days.
             /// </summary>
-            public const int DueDate = 12; 
+            public static int TempFilesTimeToDelete = 420;
         }
         public static class Company
         {
