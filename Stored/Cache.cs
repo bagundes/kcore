@@ -7,12 +7,14 @@ namespace KCore.Stored
 {
     public static class Cache
     {
+        public static string LOG => typeof(Cache).Name;
+
         private static int  block = 0;
 
         #region Global config
 
         private static KCore.Lists.MyDictionary _globalConfig;
-        public static IReadOnlyDictionary<string, dynamic> GlobalConfig
+        private static IReadOnlyDictionary<string, dynamic> GlobalConfig
         {
             get
             {
@@ -20,10 +22,10 @@ namespace KCore.Stored
                 {
                     string filename;
 
-                    if (R.IsDebugMode)
+                    if (R.DebugMode)
                     {
                         filename = System.IO.Path.Combine(R.AppPath, "config.dev.json");
-                        if (!System.IO.File.Exists(filename) && R.IsDebugMode)
+                        if (!System.IO.File.Exists(filename) && R.DebugMode)
                         {
                             System.IO.File.Copy(System.IO.Path.Combine(R.AppPath, "config.json"),
                                 System.IO.Path.Combine(R.AppPath, "config.dev.json"));
@@ -43,6 +45,28 @@ namespace KCore.Stored
                 return _globalConfig.AsReadOnly();
             }
         }
+
+        public static dynamic TryGetValue(string key, dynamic @default)
+        {
+            dynamic value;
+            if (GlobalConfig.TryGetValue(key, out value))
+                return value;
+            else
+                return @default;
+        }
+
+        public static dynamic GetValue(string key, string msgerror)
+        {
+            dynamic value;
+            if (GlobalConfig.TryGetValue(key, out value))
+                return value;
+            else
+            {
+                msgerror = msgerror ?? $"Parameter \"{key}\" does not exist in global configuration file";
+                throw new KCoreException(LOG, C.MessageEx.GlobalConfigError12_1, msgerror);
+            }
+        }
+
 
         #endregion
 
@@ -70,10 +94,10 @@ namespace KCore.Stored
             string file;
 
 
-            if (R.IsDebugMode)
+            if (R.DebugMode)
             {
                 file = System.IO.Path.Combine(R.AppPath, "config.dev.json");
-                if (!System.IO.File.Exists(file) && R.IsDebugMode)
+                if (!System.IO.File.Exists(file) && R.DebugMode)
                 {
                     System.IO.File.Copy(System.IO.Path.Combine(R.AppPath, "config.json"),
                         System.IO.Path.Combine(R.AppPath, "config.dev.json"));

@@ -30,7 +30,7 @@ namespace KCore.Web
             if (subpath.Contains("ftp://"))
                 return;
 
-            var request = (FtpWebRequest)WebRequest.Create($"ftp://{cred.Host}/{subpath}/{file.Name}.{file.Extension}");
+            var request = (FtpWebRequest)WebRequest.Create($"ftp://{cred.Host}/{subpath}/{file.Name}");
 
 
             request.Credentials = new NetworkCredential(cred.User, cred.GetPasswd());

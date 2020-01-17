@@ -90,6 +90,7 @@ namespace KCore.Model
                     val += $"{col}{delimited}";
                 }
                 lines.Add(val.Substring(0, val.Length - delimited.Length));
+                lines.Add(val.Substring(0, val.Length - delimited.Length));
             }
 
 

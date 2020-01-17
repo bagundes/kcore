@@ -14,7 +14,9 @@ namespace KCore.Shell
         public static string AppTemp(string prjName, params string[] folders)
         {
             var dir = $"{System.IO.Path.GetTempPath()}{R.Company.Name}\\{prjName.ToString()}\\{System.IO.Path.Combine(folders)}";
-            KCore.Shell.File.Delete(DateTime.Now.AddMinutes(-R.Security.TempFilesTimeToDelete), dir);
+            if(System.IO.Directory.Exists(dir))
+                KCore.Shell.File.Delete(DateTime.Now.AddMinutes(-R.Security.TempFilesTimeToDelete), dir);
+
             return System.IO.Directory.CreateDirectory(dir).FullName;
         }
 

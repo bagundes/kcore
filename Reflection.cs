@@ -34,7 +34,7 @@ namespace KCore
             }
             catch (Exception ex)
             {
-                KCore.Diagnostic.Error(R.ID, model.LOG, ex.Message, ex.StackTrace, ex.Source);
+                KCore.Diagnostic.Error(R.ID, model.LOG, ex.Message, ex.StackTrace, ex.Source + $"\nParameters:\n\tmodel:{typeof(T).Name}, name:{name} and value:{value}");
                 return false;
             }
         }

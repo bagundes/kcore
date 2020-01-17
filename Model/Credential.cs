@@ -104,8 +104,10 @@ namespace KCore.Model
         /// <param name="key">Key to access the credential</param>
         public Credential(string key)
         {
+            
             string id = null;
-            if (key.StartsWith("@") && key.EndsWith("@"))
+            if ((key.StartsWith("@") || key.StartsWith("%40")) 
+                && (key.EndsWith("@") || key.EndsWith("%40")))
                 id = KCore.Security.Hash.TokenToValue(key);
             else
                 id = IdToKey(key);
@@ -117,7 +119,7 @@ namespace KCore.Model
 
             string text = System.IO.File.ReadAllText(file.ToString());
             string json;
-            if (!KCore.R.IsDebugMode)
+            if (!KCore.R.DebugMode)
                 json = KCore.Security.Hash.Decrypt(text, id);
             else
                 json = text;
@@ -192,7 +194,7 @@ namespace KCore.Model
         {
             var file = $"{Folder}\\{Id}.{extension}";
             string json;
-            if (!KCore.R.IsDebugMode)
+            if (!KCore.R.DebugMode)
                 json = KCore.Security.Hash.Encrypt(Serialize(), Id);
             else
                 json = Serialize();

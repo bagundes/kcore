@@ -106,13 +106,11 @@ namespace KCore
         /// <returns>e-mail valid</returns>
         public string ToEmail(string mail_alt = null)
         {
-            var regex = new Regex(C.RegexMask.Email);
-            var match = regex.Match(Value.ToString());
-            if (match.Success)
+            if (Dynamic.IsEmail(Value.ToString()))
                 return ToString();
             else
             {
-                if (!string.IsNullOrEmpty(mail_alt) && regex.Match(mail_alt).Success)
+                if (!string.IsNullOrEmpty(mail_alt))
                     return mail_alt;
                 else
                     throw new KCoreException(this, C.MessageEx.InvalidValueToFormat4_2, Value.ToString(), "e-mail");
@@ -478,5 +476,11 @@ namespace KCore
             return (T)Enum.Parse(typeof(T), name);
         }
         #endregion
+
+        public static bool IsEmail(string val)
+        {
+            var regex = new Regex(C.RegexMask.Email);
+            return regex.Match(val).Success;
+        }
     }
 }

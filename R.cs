@@ -37,12 +37,7 @@ namespace KCore
         #endregion
 
         #region Debug project
-
-#if DEBUG
-        public static bool IsDebugMode = true;
-#else
-        public static bool IsDebugMode = false;
-#endif
+        public static bool DebugMode = true;
         #endregion
 
 

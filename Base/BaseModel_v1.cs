@@ -71,7 +71,7 @@ namespace KCore.Base
 
         public virtual string ToJson()
         {
-            if (R.IsDebugMode)
+            if (R.DebugMode)
             {
                 return Newtonsoft.Json.JsonConvert.SerializeObject(this,
                     new JsonSerializerSettings

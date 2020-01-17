@@ -25,6 +25,7 @@
             E_InvalidKey9 = 9,
             StoredCacheError10_1 = 10,
             InvalidCredential11_0 = 11,
+            GlobalConfigError12_1 = 12,
         }
 
         /// <summary>

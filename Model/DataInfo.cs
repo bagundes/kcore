@@ -44,7 +44,7 @@ namespace KCore.Model
 
         public override string ToString()
         {
-            if (R.IsDebugMode)
+            if (R.DebugMode)
                 return ToConnString(false);
             else
                 return ToConnString(true);

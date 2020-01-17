@@ -151,4 +151,7 @@
   <data name="M00011_0" xml:space="preserve">
     <value>The invalid credential.</value>
   </data>
+  <data name="M00012_1" xml:space="preserve">
+    <value>GCE: {0}</value>
+  </data>
 </root>

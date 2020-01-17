@@ -3,12 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>KCore</RootNamespace>
-    <AssemblyVersion>1001.2.3.1</AssemblyVersion>
+    <AssemblyVersion>1001.2.3.2</AssemblyVersion>
     <FileVersion>1001.2.3.1</FileVersion>
-    <Platforms>AnyCPU;x86</Platforms>
+    <Platforms>AnyCPU;x86;x64</Platforms>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>KCore_bfagundes</PackageId>
-    <Version>2.3.1</Version>
+    <Version>2.3.2</Version>
     <Authors>Bruno de Lima Fagundes</Authors>
     <Company>Bruno de Lima Fagundes</Company>
     <Description>Main library for my internal projects</Description>

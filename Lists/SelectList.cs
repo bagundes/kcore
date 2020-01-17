@@ -43,7 +43,7 @@ namespace KCore.Lists
         {
             var formatting = Formatting.None;
 
-            if (R.IsDebugMode)
+            if (R.DebugMode)
                 formatting = Formatting.Indented;
 
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(this,

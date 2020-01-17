@@ -158,5 +158,14 @@ namespace KCore.Content {
                 return ResourceManager.GetString("M00011_0", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GCE: {0}.
+        /// </summary>
+        internal static string M00012_1 {
+            get {
+                return ResourceManager.GetString("M00012_1", resourceCulture);
+            }
+        }
     }
 }
